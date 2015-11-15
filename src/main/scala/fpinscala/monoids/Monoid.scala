@@ -217,6 +217,12 @@ trait Foldable[F[_]] {
     foldRight(as)(List[A]())(_ :: _)
 }
 
+object ListFoldable extends Foldable[List] {
+  override def foldMap[A,B](as:List[A])(f:A => B)(mb:Monoid[B]):B = {
+    as.foldRight(mb.zero)((a,b) => mb.op(f(a),b))
+  }
+}
+
 
 //Ex14. Recall the Tree data type from Chap3. Implement a Foldable instance for it.
 

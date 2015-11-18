@@ -23,6 +23,13 @@ object test {
     println(fib.take(10).toList)
     println(ones_2.take(10).toList)
     println(Stream(2,3,4,5).map_2(x => x + 1).toList)
-
+    println(Stream(1,2,3,4,5,6,7).takeWhile(_ < 4).toList)
+    println(Stream(1,2,3,4,5,6,7).takeWhile_2(_ < 4).toList)
+    println(startsWith(Stream(1,2,3,4,5),Stream(1,2,3)))
+    println(startsWith(Stream(1,2,3),Stream(1,2,3)))
+    println(startsWith(Stream(1,2,3),Stream(1,2,3,4)))
+    println(startsWith(Empty,Empty))
+    println(Stream(1,2,3,4).tails)
+    println(hasSubsequence(Stream(1,2,3,4,5),Stream(2,3,5)))
   }
 }

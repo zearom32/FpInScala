@@ -14,6 +14,7 @@ trait Stream[+A] {
     case Cons(h, t) => h() :: t().toList
   }
 
+  override def toString() = this.toList.toString()
   //Ex2. Write a function take for returning the first n elements of a Stream.
   def take(n: Int): Stream[A] = this match {
     case Cons(h, t) if n > 1 => cons(h(), t().take(n - 1))
@@ -87,6 +88,26 @@ trait Stream[+A] {
       case _ => None
     }
   }
+
+  def takeWhile_2(f: A => Boolean) = {
+    unfold(this){
+      case Cons(h,t) if f(h()) => Some((h(),t()))
+      case _ => None
+    }
+  }
+
+  //TODO: implement zip and zip2
+
+  //Ex14. implement tails using unfold. For a given Stream, tails returns the Stream of suffixes of the input sequence,
+  //starting with the origin Stream. So, given Stream(1,2,3), it would return Stream(Stream(1,2,3),Stream(2,3),Stream(3),Stream.empty)
+
+  def tails:Stream[Stream[A]] = {
+    unfold(this){
+      case Cons(h,t) => Some(Cons(h,t),t())
+      case Empty => None
+    }
+  }
+
 }
 
 
@@ -141,4 +162,14 @@ object Stream {
 
   def ones_2 = constant_2(1)
 
+
+  //Ex13(hard): implement startsWith using functions you've written. It should check if one Stream is a prefix of another.
+  //For instance, Stream(1,2,3) startsWith Stream(1,2) would be true.
+  def startsWith[A](s:Stream[A],s2:Stream[A]):Boolean = (s,s2) match{
+    case (_,Empty) => true
+    case (Cons(h1,t1),Cons(h2,t2)) if h1() == h2() => startsWith(t1(),t2())
+    case _ => false
+  }
+
+  def hasSubsequence[A](s1:Stream[A],s2:Stream[A]):Boolean = s1.tails exists (startsWith(_,s2))
 }

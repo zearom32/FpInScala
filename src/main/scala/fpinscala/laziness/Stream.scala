@@ -108,6 +108,17 @@ trait Stream[+A] {
     }
   }
 
+  //Ex15. (hard, optional): Generalize tails to the function scanRight, which is like a foldRight that returns a stream of
+  //the intermediate result. For Example:
+  // Stream(1,2,3).scanRight(0)(_ + _).toList
+   def scanRight[B](z: => B)(f:(A,=> B) => B):Stream[B] = {
+    foldRight((z,Stream(z)))((a,b) => {
+      lazy val p = b
+      val u = f(a,p._1)
+      (u,cons(u,p._2))
+    }
+    )._2
+  }
 }
 
 

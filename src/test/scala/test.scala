@@ -31,5 +31,6 @@ object test {
     println(startsWith(Empty,Empty))
     println(Stream(1,2,3,4).tails)
     println(hasSubsequence(Stream(1,2,3,4,5),Stream(2,3,5)))
+    Stream(1,2,3).scanRight(0)(_ + _).toList.foreach(println(_))
   }
 }

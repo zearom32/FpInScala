@@ -7,3 +7,5 @@ project/boot
 project.vim
 *.old
 test
+.idea
+

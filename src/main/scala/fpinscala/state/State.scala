@@ -149,11 +149,9 @@ object State{
     State((s:S) => go(s,sas,List()))
   }
 
-
   def sequence2[S,A](sas: List[State[S,A]]):State[S,List[A]] = {
     sas.foldRight(unit[S,List[A]](List[A]()))((a,acc) => a.map2(acc)(_ :: _))
   }
-
 
   def modify[S](f: S => S):State[S,Unit] = for {
     s <- get
@@ -163,6 +161,24 @@ object State{
   def get[S]:State[S,S] = State(s => (s,s))
   def set[S](s:S):State[S,Unit] = State(_ => ((),s))
 
+
+}
+
+sealed trait Input
+case object Coin extends Input
+case object Turn extends Input
+
+case class Machine(locked: Boolean, candies:Int, coins:Int)
+object Candy{
+  def handleInput(input:Input):State[Machine, Int] = State(machine => input match{
+    case Coin if machine.locked && machine.candies > 0 => (machine.coins+1,Machine(false,machine.candies,machine.coins+1))
+    case Turn if !machine.locked && machine.candies > 0 => (machine.coins, Machine(true,machine.candies-1,machine.coins))
+    case _ =>(machine.coins,machine)
+  })
+
+  def simulateMachine(inputs:List[Input]):State[Machine,Int] = {
+    State.sequence(inputs.map(handleInput)).map(xs => xs.last)
+  }
 
 }
 

@@ -11,12 +11,8 @@ object test {
     val m = productMonoid(intAddition, intAddition)
     val p = ListFoldable.foldMap(List(1,2,3,4))(a => (a,1))(m)
     println(p)
-    def f(i: => Int) = {
-      val j = i
-      println("j")
-      (j,j)
-    }
-    f({println("222");4})
+
+
     val w = Stream(1,2,3,4).map(_ + 10).filter(_ % 2 == 0)
     println(w.toList)
     import Stream._

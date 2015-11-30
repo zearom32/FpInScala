@@ -9,6 +9,8 @@ import language.implicitConversions
 object Par {
   type Par[A] = ExecutorService => Future[A]
 
+  def equal[A](e:ExecutorService)(p:Par[A], p2: Par[A]):Boolean  = p(e).get == p2(e).get
+
   def map2[A,B,C](a:Par[A], b:Par[B])(f:(A,B) => C):Par[C] =
     (es:ExecutorService) => {
       val af = a(es)
@@ -70,5 +72,44 @@ object Par {
     val pars = l.map(asyncF(a => if (f(a)) List(a) else List()))
     map(sequence(pars))(_.flatten)
   }
+
+  def delay[A](fa: => Par[A]):Par[A] = es => fa(es)
+
+  //Ex14. Try writing a function to choose between two forking computations based on the result of an initial computation.
+  //      Can this be implemented in terms of existing combinators or is a new primitive required?
+  def choice[A](a: Par[Boolean])(ifTrue: Par[A], ifFalse:Par[A]):Par[A] = es => {
+    if (a(es).get)
+      ifTrue(es)
+    else
+      ifFalse(es)
+  }
+
+  //Ex15. Implement choiceN and then choice in terms of choiceN
+  def choiceN[A](n:Par[Int])(choices: List[Par[A]]):Par[A] = es =>{
+    val index = run(es)(n).get
+    run(es)(choices(index))
+  }
+
+  //Ex16. Still, let's keep looking at some variations. Try implementing the following combinator. Here, instead of a list
+  //      of  computations, we have a Map of them.
+
+  def choiceMap[A,B](a: Par[A])(choices: Map[A,Par[B]]):Par[B] = es => {
+    run(es)(choices(run(es)(a).get))
+  }
+
+  //Ex17.
+  def chooser[A,B](a:Par[A])(choices: A => Par[B]):Par[B] = es => {
+    run(es)(choices(run(es)(a).get))
+  }
+
+  def flatMap[A,B](a:Par[A])(choices: A => Par[B]):Par[B] = es => {
+    run(es)(choices(run(es)(a).get()))
+  }
+
+def join[A](a:Par[Par[A]]):Par[A] = es =>{
+  run(es)(run(es)(a).get())
+}
+
+
 
 }
